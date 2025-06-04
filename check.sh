@@ -1,22 +1,12 @@
 #!/bin/bash
 IFS=$' \t\r\n'
 
-CHAT_ID=""
-BOT_TOKEN=""
-
-while [ "$#" -gt 0 ]; do
-  case "$1" in
-    --chat_id=*) CHAT_ID="${1#*=}"; shift 1 ;;
-    --bot_token=*) BOT_TOKEN="${1#*=}"; shift 1 ;;
-    *) echo "Unknown parameter: $1"; exit 1 ;;
-  esac
-done
-
-check_uri() {
+get_log_message() {
     local uri="$1"
-    local response=$(curl -sKL -o /dev/null -w "%{http_code}" "$uri")
+    local res_code="$2"
+    local req_time="$3"
 
-    echo $response
+    echo "[$(date +"%Y-%m-%d %H:%M:%S %Z")] $uri $res_code $req_time"
 }
 
 send_message_to_telegram() {
@@ -24,7 +14,7 @@ send_message_to_telegram() {
     local bot_token="$2"
     local text="$3"
 
-    curl -X POST \
+    curl -skL -o /dev/null -X POST \
         -H "Content-Type: application/json" \
         -d '{
                 "chat_id": "'"$chat_id"'",
@@ -34,16 +24,29 @@ send_message_to_telegram() {
 }
 
 check_flow() {
-    local uri_file_path="$1"
+    local ALARM_CHAT_ID=""
+    local LOG_CHAT_ID=""
+    local BOT_TOKEN=""
+    local URI_FILE=""
+
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+        --alarm_chat_id=*) ALARM_CHAT_ID="${1#*=}"; shift 1 ;;
+        --log_chat_id=*) LOG_CHAT_ID="${1#*=}"; shift 1 ;;
+        --bot_token=*) BOT_TOKEN="${1#*=}"; shift 1 ;;
+        --uri_file=*) URI_FILE="${1#*=}"; shift 1 ;;
+        *) echo "Unknown parameter: $1"; exit 1 ;;
+        esac
+    done
 
     while read -r uri; do
-        code=$(check_uri $uri)
+        read res_code req_time <<< $(curl -skL -o /dev/null -w "%{http_code} %{time_total}" "$uri")
 
-        if [ "$code" != "200" ]; then
-            send_message_to_telegram $CHAT_ID $BOT_TOKEN "$uri doesn't respond"
+        send_message_to_telegram "$LOG_CHAT_ID" "$BOT_TOKEN" "$(get_log_message $uri $res_code $req_time)"
+
+        if [ "$res_code" != "200" ]; then
+            send_message_to_telegram "$ALARM_CHAT_ID" "$BOT_TOKEN" "Alarm\n$(get_log_message $uri $res_code $req_time)"
         fi
 
-    done < $uri_file_path
+    done < $URI_FILE
 }
-
-check_flow ./list

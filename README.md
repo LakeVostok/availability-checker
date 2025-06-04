@@ -9,9 +9,10 @@ where:
 --bot_token - token for telegram bot
 
 # Storing credentials
-
-echo "CHAT_ID=abc123" > /etc/app_creds
-echo "BOT_TOKEN=abc123" > /etc/app_creds
+```
+echo "export ALARM_CHAT_ID=abc123" > /etc/app_creds
+echo "export LOG_CHAT_ID=abc123" > /etc/app_creds
+echo "export BOT_TOKEN=abc123" > /etc/app_creds
 chmod 600 /etc/app_creds
 chown root:root /etc/app_creds
-source /etc/app_creds
+```
