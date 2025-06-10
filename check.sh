@@ -5,8 +5,9 @@ get_log_message() {
     local uri="$1"
     local res_code="$2"
     local req_time="$3"
+    local errormsg="$4"
 
-    echo "[$(date +"%Y-%m-%d %H:%M:%S %Z")] $uri $res_code $req_time"
+    echo "[$(date +"%Y-%m-%d %H:%M:%S %Z")] $uri $res_code $req_time\n$errormsg"
 }
 
 send_message_to_telegram() {
@@ -40,12 +41,12 @@ check_flow() {
     done
 
     while read -r uri; do
-        read res_code req_time <<< $(curl -skL -o /dev/null -w "%{http_code} %{time_total}" "$uri")
+        read res_code req_time errormsg <<< $(curl -skL -o /dev/null -w "%{http_code} %{time_total} %{errormsg}" "$uri")
 
-        send_message_to_telegram "$LOG_CHAT_ID" "$BOT_TOKEN" "$(get_log_message $uri $res_code $req_time)"
+        send_message_to_telegram "$LOG_CHAT_ID" "$BOT_TOKEN" "$(get_log_message $uri $res_code $req_time $errormsg)"
 
         if [ "$res_code" != "200" ]; then
-            send_message_to_telegram "$ALARM_CHAT_ID" "$BOT_TOKEN" "Alarm\n$(get_log_message $uri $res_code $req_time)"
+            send_message_to_telegram "$ALARM_CHAT_ID" "$BOT_TOKEN" "Alarm\n$(get_log_message $uri $res_code $req_time $errormsg)"
         fi
 
     done < $URI_FILE
