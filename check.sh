@@ -41,12 +41,12 @@ check_flow() {
     done
 
     while read -r uri; do
-        read res_code req_time errormsg <<< $(curl -skL -o /dev/null -w "%{http_code} %{time_total} %{errormsg}" "$uri")
+        IFS='|' read -r res_code req_time errormsg <<< $(curl -skL -o /dev/null -w "%{http_code}|%{time_total}|%{errormsg}" "$uri")
 
-        send_message_to_telegram "$LOG_CHAT_ID" "$BOT_TOKEN" "$(get_log_message $uri $res_code $req_time $errormsg)"
+        send_message_to_telegram "$LOG_CHAT_ID" "$BOT_TOKEN" "$(get_log_message "$uri" "$res_code" "$req_time" "$errormsg")"
 
         if [ "$res_code" != "200" ]; then
-            send_message_to_telegram "$ALARM_CHAT_ID" "$BOT_TOKEN" "Alarm\n$(get_log_message $uri $res_code $req_time $errormsg)"
+            send_message_to_telegram "$ALARM_CHAT_ID" "$BOT_TOKEN" "Alarm\n$(get_log_message "$uri" "$res_code" "$req_time" "$errormsg")"
         fi
 
     done < $URI_FILE
