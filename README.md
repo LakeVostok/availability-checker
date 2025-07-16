@@ -3,7 +3,9 @@ To launch:
 2) Create telegram bot and group, add the bot to this chat and fill the .env file:
 `LOG_CHAT_ID` - chat for all messages,
 `ALARM_CHAT_ID` - chat only for alarms, in dev it is ok to reuse LOG_CHAT_ID,
-`BOT_TOKEN` - bot token
+`BOT_TOKEN` - bot token,
+SMS_GATE_USERNAME -
+SMS_GATE_PASSWORD - leave both empty for dev
 3) Work with docker:
 `docker compose up -d` - (re)launch the service.
 `docker compose down` - stop the service

@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 IFS=$' \t\r\n'
+cd "$(dirname "$(readlink -f "$0")")"
+
+source ./send_message_to_telegram.sh
 
 get_log_message() {
     local uri="$1"
@@ -11,21 +14,7 @@ get_log_message() {
     echo "[$(date +"%Y-%m-%d %H:%M:%S %Z")] $uri $res_code $req_time\n$errormsg"
 }
 
-send_message_to_telegram() {
-    local chat_id="$1"
-    local bot_token="$2"
-    local text="$3"
-
-    curl -skL -o /dev/null -X POST \
-        -H "Content-Type: application/json" \
-        -d '{
-                "chat_id": "'"$chat_id"'",
-                "text": "'"$text"'"
-            }' \
-        https://api.telegram.org/bot$bot_token/sendMessage        
-}
-
-check_flow() {
+check() {
     local ALARM_CHAT_ID=""
     local LOG_CHAT_ID=""
     local BOT_TOKEN=""
@@ -55,4 +44,4 @@ check_flow() {
     done
 }
 
-check_flow --alarm_chat_id="$ALARM_CHAT_ID" --log_chat_id="$LOG_CHAT_ID" --bot_token="$BOT_TOKEN" --uri_list="https://online.sberbank.co.in/ https://guest.online.sberbank.co.in/"
+check --alarm_chat_id="$ALARM_CHAT_ID" --log_chat_id="$LOG_CHAT_ID" --bot_token="$BOT_TOKEN" --uri_list="https://online.sberbank.co.in/ https://guest.online.sberbank.co.in/"
