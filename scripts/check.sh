@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 IFS=$' \t\r\n'
 
 get_log_message() {
@@ -28,26 +29,30 @@ check_flow() {
     local ALARM_CHAT_ID=""
     local LOG_CHAT_ID=""
     local BOT_TOKEN=""
-    local URI_FILE=""
+    local URI_LIST=""
 
     while [ "$#" -gt 0 ]; do
         case "$1" in
         --alarm_chat_id=*) ALARM_CHAT_ID="${1#*=}"; shift 1 ;;
         --log_chat_id=*) LOG_CHAT_ID="${1#*=}"; shift 1 ;;
         --bot_token=*) BOT_TOKEN="${1#*=}"; shift 1 ;;
-        --uri_file=*) URI_FILE="${1#*=}"; shift 1 ;;
+        --uri_list=*) URI_LIST="${1#*=}"; shift 1 ;;
         *) echo "Unknown parameter: $1"; exit 1 ;;
         esac
     done
 
-    while read -r uri; do
-        IFS='|' read -r res_code req_time errormsg <<< $(curl -skL -o /dev/null -w "%{http_code}|%{time_total}|%{errormsg}" "$uri")
+    read -ra list <<< "$URI_LIST"
+    for uri in "${list[@]}"; do
+        uuid=$(cat /proc/sys/kernel/random/uuid)
+
+        IFS='|' read -r res_code req_time errormsg <<< $(curl -skL -o /dev/null -w "%{http_code}|%{time_total}|%{errormsg}" -H "User-Agent: Friend" -H "Req-Id: $uuid" "$uri")
 
         send_message_to_telegram "$LOG_CHAT_ID" "$BOT_TOKEN" "$(get_log_message "$uri" "$res_code" "$req_time" "$errormsg")"
 
         if [ "$res_code" != "200" ]; then
             send_message_to_telegram "$ALARM_CHAT_ID" "$BOT_TOKEN" "Alarm\n$(get_log_message "$uri" "$res_code" "$req_time" "$errormsg")"
         fi
-
-    done < $URI_FILE
+    done
 }
+
+check_flow --alarm_chat_id="$ALARM_CHAT_ID" --log_chat_id="$LOG_CHAT_ID" --bot_token="$BOT_TOKEN" --uri_list="https://online.sberbank.co.in/ https://guest.online.sberbank.co.in/"

@@ -1,18 +1,13 @@
-./list contains a list of uri, delimeted by \n
+To launch:
+1) Install docker https://docs.docker.com/engine/install/
+2) Create telegram bot and group, add the bot to this chat and fill the .env file:
+`LOG_CHAT_ID` - chat for all messages,
+`ALARM_CHAT_ID` - chat only for alarms, in dev it is ok to reuse LOG_CHAT_ID,
+`BOT_TOKEN` - bot token
+3) Work with docker:
+`docker compose up -d` - (re)launch the service.
+`docker compose down` - stop the service
+Take a look for the rest commands in documentation or chatgpt
+Also it is ok to use docker desktop
 
-curl ignores SSL and follows redirects
-
-Example of use:
-./check.sh --chat_id=123 --bot_token=456
-where:
---chat_id - id of telegram chat
---bot_token - token for telegram bot
-
-# Storing credentials
-```
-echo "export ALARM_CHAT_ID=abc123" > /etc/app_creds
-echo "export LOG_CHAT_ID=abc123" > /etc/app_creds
-echo "export BOT_TOKEN=abc123" > /etc/app_creds
-chmod 600 /etc/app_creds
-chown root:root /etc/app_creds
-```
+Also it is possible to run scripts without docker (but unix-compatible shell should be used), e.g. `ALARM_CHAT_ID=xxx LOG_CHAT_ID=yyy BOT_TOKEN=zzz ./scripts/check.sh`

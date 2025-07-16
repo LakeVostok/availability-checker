@@ -1,0 +1,13 @@
+services:
+  checker:
+    env_file:
+      - .env
+    build:
+      dockerfile: ./Dockerfile
+    networks:
+      - common
+
+networks:
+  common:
+    driver: bridge
+
