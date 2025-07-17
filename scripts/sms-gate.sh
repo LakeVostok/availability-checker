@@ -4,7 +4,7 @@ cd "$(dirname "$(readlink -f "$0")")"
 
 source ./send_message_to_telegram.sh
 
-limit=1000
+limit=500
 
 check() {
     local ALARM_CHAT_ID=""
