@@ -1,2 +1,2 @@
-# 21 UTC is 12 MSK
-# 0 21 * * * root /opt/scripts/sms-gate.sh >> /var/log/sms-gate.log 2>&1
+# 7 UTC is 10 MSK
+0 7 * * * root /opt/scripts/sms-gate.sh >> /var/log/sms-gate.log 2>&1
