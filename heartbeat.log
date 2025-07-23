@@ -1,0 +1,3 @@
+2025-07-23T17:06:00.176Z - INFO: [https://www.google.com] Heartbeat successful
+2025-07-23T17:06:05.003Z - ERROR: [https://another-service.com/ping] Request timed out
+2025-07-23T17:06:05.011Z - ERROR: [https://another-service.com/ping] Request failed: socket hang up
