@@ -1,0 +1,1 @@
+* * * * * root /usr/local/bin/node /opt/scripts/check.js >> /var/log/check.log 2>&1

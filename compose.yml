@@ -1,8 +1,18 @@
 services:
-  checker:
+  sms-gate:
     env_file:
       - .env
     build:
+      context: ./sms-gate
+      dockerfile: ./Dockerfile
+    networks:
+      - common
+
+  bank:
+    env_file:
+      - .env
+    build:
+      context: ./bank
       dockerfile: ./Dockerfile
     networks:
       - common

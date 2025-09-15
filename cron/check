@@ -1,1 +1,0 @@
-* * * * * root /opt/scripts/check.sh >> /var/log/check.log 2>&1
