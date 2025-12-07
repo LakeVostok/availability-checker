@@ -2,7 +2,7 @@
 set -euo pipefail
 cd "$(dirname "$(readlink -f "$0")")"
 
-limit=1500
+limit=2000
 
 send_message_to_telegram() {
     local chat_id="$1"
