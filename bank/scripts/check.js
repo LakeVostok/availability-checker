@@ -19,72 +19,78 @@ const bankClient = new BankClient;
 
 const uriList = [
   "https://sberbank.co.in/",
-  "https://online.sberbank.co.in/",
+  "https://sber.bank.in/",
   "https://guest.online.sberbank.co.in/",
 ];
 
 const getResult = async ({ uri, uuid }) => {
   try {
-    const response = await bankClient.get({ uri, uuid });
+    const [response, diagnostics] = await bankClient.get({ uri, uuid });
 
-    if (response.ok && response.status === 200) {
+    if (response.status === "200") {
       return {
         right: {
-          status: response.status
+          status: response.status,
+          diagnostics
         }
       }
     } else {
-      const rawResponse = await response.text();
-
       return {
         left: {
-          status: response.status ? String(response.status) : "000",
-          message: response.statusText || "",
-          content: rawResponse,
+          status: response.status,
+          message: response.message,
+          content: response.body,
+          diagnostics,
         }
       }
-
     }
   } catch (e) {
     return {
       left: {
         status: e.status ? String(e.status) : "000",
-        message: e.cause.message || "",
+        message: e.message || "",
+        diagnostics,
       }
     }
   }
 }
 
-const checkUri = withLatency(getResult)
-
 async function checkUriList({ uriList }) {
   for (const uri of uriList) {
     const uuid = randomUUID();
+    const [response, requestDuration] = await withLatency(getResult)({ uri, uuid });
 
-    const [response, requestDuration] = await checkUri({ uri, uuid });
 
     if (response.left) {
       const alarmMessage = getLogMessage({
         message: `${uri} ${response.left.status} ${requestDuration}\n${response.left.message}`
       });
 
+      const diagnosticsAttachment = {
+        caption: "diagnostics",
+        content: JSON.stringify(response.left.diagnostics, null, 4),
+        attachmentName: `${uuid}.json`
+      }
+
       if (response.left.content) {
         await Promise.all([
           alarmTelegramClient.sendAttachment({
             caption: alarmMessage,
             content: response.left.content,
-            attachmentName: uuid
+            attachmentName: `${uuid}.txt`
           }),
+          alarmTelegramClient.sendAttachment(diagnosticsAttachment),
           logTelegramClient.sendAttachment({
             caption: alarmMessage,
             content: response.left.content,
-            attachmentName: uuid
+            attachmentName: `${uuid}.txt`
           })
         ])
       } else {
         await Promise.all([
           alarmTelegramClient.sendMessage(alarmMessage),
-          logTelegramClient.sendMessage(alarmMessage)
+          alarmTelegramClient.sendAttachment(diagnosticsAttachment),
+          logTelegramClient.sendMessage(alarmMessage),
         ])
       }
     } else {

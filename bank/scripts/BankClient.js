@@ -1,25 +1,24 @@
-import { Agent } from 'undici';
-
-const httpsAgent = new Agent({
-    connect: {
-      rejectUnauthorized: false,
-      timeout: 15000
-    },
-  });
+import { fetchWIthStages } from './fetchWIthStages.js';
   
 export class BankClient {
     get = async ({
-    uri,
-    uuid,
+        uri,
+        uuid,
     }) => {
-        const response = await fetch(uri, {
-            dispatcher: httpsAgent,
-            headers: {
-                "User-Agent": "Friend",
-                "Req-Id": uuid,
-            }
-        });
+        const diagnostics = await fetchWIthStages(uri, uuid);
+        const httpsStage = diagnostics.stages.find(({stage}) => stage === "https");
 
-        return response;
+        const response = {
+            status: httpsStage ? String(httpsStage.status) : "000",
+            message: httpsStage ? httpsStage.statusMessage : "",
+            body: diagnostics.body,
+        }
+
+        delete diagnostics.body;
+
+        return [
+            response,
+            diagnostics,
+        ];
     }
 }
