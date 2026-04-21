@@ -67,7 +67,7 @@ async function checkUriList({ uriList }) {
       const diagnosticsAttachment = {
         caption: "diagnostics",
         content: JSON.stringify(response.left.diagnostics, null, 4),
-        attachmentName: `${uuid}.json`
+        attachmentName: `${uuid}.txt`
       }
 
       if (response.left.content) {
@@ -75,13 +75,13 @@ async function checkUriList({ uriList }) {
           alarmTelegramClient.sendAttachment({
             caption: alarmMessage,
             content: response.left.content,
-            attachmentName: `${uuid}.txt`
+            attachmentName: `html.${uuid}.txt`
           }),
           alarmTelegramClient.sendAttachment(diagnosticsAttachment),
           logTelegramClient.sendAttachment({
             caption: alarmMessage,
             content: response.left.content,
-            attachmentName: `${uuid}.txt`
+            attachmentName: `html.${uuid}.txt`
           })
         ])
       } else {
