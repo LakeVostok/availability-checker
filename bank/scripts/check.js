@@ -19,7 +19,7 @@ const bankClient = new BankClient;
 
 const uriList = [
   "https://sberbank.co.in/",
-  "https://sber.bank.in/",
+  "https://online.sberbank.co.in/",
   "https://guest.online.sberbank.co.in/",
 ];
 
@@ -49,7 +49,6 @@ const getResult = async ({ uri, uuid }) => {
       left: {
         status: e.status ? String(e.status) : "000",
         message: e.message || "",
-        diagnostics,
       }
     }
   }
@@ -59,7 +58,6 @@ async function checkUriList({ uriList }) {
   for (const uri of uriList) {
     const uuid = randomUUID();
     const [response, requestDuration] = await withLatency(getResult)({ uri, uuid });
-
 
     if (response.left) {
       const alarmMessage = getLogMessage({
