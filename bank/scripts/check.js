@@ -18,9 +18,9 @@ const logTelegramClient = new TelegramClient({
 const bankClient = new BankClient;
 
 const uriList = [
-  "https://sberbank.co.in/",
-  "https://online.sberbank.co.in/",
-  "https://guest.online.sberbank.co.in/",
+  "https://sber.bank.in/",
+  "https://online.sber.bank.in/",
+  "https://guest.sber.bank.in/",
 ];
 
 const getResult = async ({ uri, uuid }) => {
