@@ -1,7 +1,7 @@
 FROM node:24.4.1-bookworm-slim
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends cron dos2unix curl && \
+    apt-get install -y --no-install-recommends cron dos2unix curl iputils-ping dnsutils && \
     rm -rf /var/lib/apt/lists/*
 
 COPY ./entrypoint.sh /usr/local/bin/entrypoint.sh

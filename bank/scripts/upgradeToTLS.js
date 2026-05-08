@@ -6,6 +6,7 @@ export const upgradeToTLS = (socket, hostname) => {
             socket: socket,
             rejectUnauthorized: false,
             servername: hostname,
+            timeout: 30_000,
         });
         
         tlsSocket.once('secureConnect', () => {

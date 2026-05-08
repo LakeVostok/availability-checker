@@ -43,7 +43,7 @@ export const fetchWIthStages = async (url, uuid) => {
     const [createConnectionResult, createConnectionDuration] = await withLatency(createConnection)({
         host: resolvedIp,
         port: 443,
-        timeout: 5000
+        timeout: 30_000
     })
     if ('left' in createConnectionResult) {
         diagnostics.stages.push({
@@ -100,7 +100,7 @@ export const fetchWIthStages = async (url, uuid) => {
     stage = "https";
     const [httpResult, httpDuration] = await withLatency(fetchHtml)(url, {
         socket: tlsSocket,
-        timeout: { read: 10000 }
+        timeout: { read: 30_000 }
     }, uuid);
     if ('left' in httpResult) {
         diagnostics.stages.push({
